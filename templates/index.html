@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Student Records</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #202b27;
+      --muted: #68716c;
+      --paper: #f4f3ed;
+      --surface: #fffefa;
+      --line: #d9ddd5;
+      --green: #276b56;
+      --green-dark: #194b3c;
+      --coral: #c65a3b;
+      --soft-green: #e4eee7;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Segoe UI", Tahoma, sans-serif;
+    }
+    header {
+      color: #f8f7f0;
+      background: var(--green-dark);
+      border-bottom: 5px solid #d89a57;
+      padding: 23px max(24px, calc((100vw - 1240px) / 2));
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+    .brand-name { font: 700 18px Georgia, serif; }
+    .brand-note { color: #c7d7ce; font-size: 13px; }
+    main { max-width: 1240px; margin: 0 auto; padding: 44px 24px 64px; }
+    .page-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+    .eyebrow { color: var(--green); font-size: 12px; font-weight: 700; text-transform: uppercase; }
+    h1 { margin: 8px 0 0; font: 500 38px Georgia, serif; }
+    .record-count { color: var(--muted); font-size: 14px; }
+    .record-count strong { color: var(--ink); font: 700 24px Georgia, serif; margin-right: 5px; }
+    .notice {
+      margin: 0 0 20px;
+      padding: 11px 14px;
+      background: var(--soft-green);
+      border-left: 3px solid var(--green);
+      font-size: 14px;
+    }
+    .layout { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 36px; align-items: start; }
+    .form-panel { padding: 22px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+    h2 { margin: 0 0 20px; font: 600 21px Georgia, serif; }
+    label { display: block; margin: 15px 0 6px; color: #46514b; font-size: 13px; font-weight: 650; }
+    input {
+      width: 100%; min-height: 42px; padding: 9px 11px;
+      color: var(--ink); background: white; border: 1px solid #cbd2ca; border-radius: 4px;
+      font: inherit;
+    }
+    input:focus { outline: 2px solid #8bb7a2; outline-offset: 1px; border-color: var(--green); }
+    .form-actions { display: flex; gap: 9px; margin-top: 20px; }
+    button, .button {
+      display: inline-flex; justify-content: center; align-items: center;
+      min-height: 39px; padding: 8px 13px; border: 0; border-radius: 4px;
+      color: white; background: var(--green); font: 650 13px "Segoe UI", Tahoma, sans-serif;
+      text-decoration: none; cursor: pointer;
+    }
+    button:hover, .button:hover { background: var(--green-dark); }
+    .button.secondary { color: var(--ink); background: #e8ebe5; }
+    .button.secondary:hover { background: #dce1d9; }
+    .directory-head { display: flex; justify-content: space-between; gap: 18px; align-items: center; margin-bottom: 15px; }
+    .directory-head h2 { margin: 0; }
+    .search { display: flex; gap: 7px; width: min(100%, 340px); }
+    .search input { min-width: 0; }
+    .search button { flex: 0 0 auto; }
+    .table-wrap { overflow-x: auto; border-top: 1px solid var(--line); }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th { padding: 12px 10px; color: var(--muted); font-size: 11px; text-transform: uppercase; }
+    td { padding: 14px 10px; border-top: 1px solid var(--line); font-size: 14px; white-space: nowrap; }
+    td:first-child { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .student-name { font-weight: 650; }
+    .row-actions { display: flex; align-items: center; gap: 11px; }
+    .text-action { padding: 0; color: var(--green); background: transparent; font-size: 13px; }
+    .text-action:hover { color: var(--green-dark); background: transparent; text-decoration: underline; }
+    .text-action.delete { color: var(--coral); }
+    .empty { padding: 32px 10px; color: var(--muted); text-align: center; }
+    @media (max-width: 760px) {
+      main { padding: 30px 17px 44px; }
+      header { padding: 18px 17px; }
+      .layout { grid-template-columns: 1fr; gap: 30px; }
+      .page-heading { align-items: start; }
+      h1 { font-size: 32px; }
+      .directory-head { align-items: stretch; flex-direction: column; }
+      .search { width: 100%; }
+      .brand-note { text-align: right; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="brand-name">Northfield · Student Office</div>
+      <div class="brand-note">Academic records</div>
+    </div>
+  </header>
+  <main>
+    <div class="page-heading">
+      <div>
+        <div class="eyebrow">Records / Students</div>
+        <h1>Student records</h1>
+      </div>
+      <div class="record-count"><strong>{{ count }}</strong> total records</div>
+    </div>
+
+    {% if notice %}<p class="notice" role="status">{{ notice }}</p>{% endif %}
+
+    <div class="layout">
+      <section class="form-panel" aria-labelledby="form-title">
+        <h2 id="form-title">{{ "Update student" if editing else "Add a student" }}</h2>
+        <form method="post" action="{{ url_for('update_student', student_id=editing.id) if editing else url_for('add_student') }}">
+          <label for="name">Student name</label>
+          <input id="name" name="name" maxlength="120" required value="{{ editing.name if editing else '' }}">
+          <label for="course">Course</label>
+          <input id="course" name="course" maxlength="120" required value="{{ editing.course if editing else '' }}">
+          <label for="semester">Semester</label>
+          <input id="semester" name="semester" type="number" min="1" step="1" required value="{{ editing.semester if editing else '' }}">
+          <label for="marks">Marks</label>
+          <input id="marks" name="marks" type="number" step="any" required value="{{ editing.marks if editing else '' }}">
+          <div class="form-actions">
+            <button type="submit">{{ "Save changes" if editing else "Add student" }}</button>
+            {% if editing %}<a class="button secondary" href="{{ url_for('index') }}">Cancel</a>{% endif %}
+          </div>
+        </form>
+      </section>
+
+      <section aria-labelledby="directory-title">
+        <div class="directory-head">
+          <h2 id="directory-title">Directory</h2>
+          <form class="search" method="get" action="{{ url_for('index') }}">
+            <input name="search" aria-label="Search name or course" placeholder="Search name or course" value="{{ search }}">
+            <button type="submit">Search</button>
+            {% if search %}<a class="button secondary" href="{{ url_for('index') }}" aria-label="Clear search">Clear</a>{% endif %}
+          </form>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Name</th><th>Course</th><th>Semester</th><th>Marks</th><th>Actions</th></tr></thead>
+            <tbody>
+              {% for student in students %}
+              <tr>
+                <td>{{ student.id }}</td>
+                <td class="student-name">{{ student.name }}</td>
+                <td>{{ student.course }}</td>
+                <td>{{ student.semester }}</td>
+                <td>{{ student.marks }}</td>
+                <td>
+                  <div class="row-actions">
+                    <a class="text-action" href="{{ url_for('index', edit=student.id, search=search) }}">Edit</a>
+                    <form method="post" action="{{ url_for('delete_student', student_id=student.id) }}" onsubmit="return confirm('Delete this student record?')">
+                      <button class="text-action delete" type="submit">Delete</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              {% else %}
+              <tr><td class="empty" colspan="6">{{ "No matching students." if search else "No student records yet." }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
